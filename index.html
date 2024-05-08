@@ -30,11 +30,10 @@
         bottom: 0;
         width: 100%;
         z-index: 1;
-        display: none;
     }
     #container {
         width: 100%;
-        height: calc(100vh - 20px);
+        height: calc(100vh - 60px);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -44,8 +43,8 @@
     #game {
         background-color: #000;
         border: 2px solid #fff;
-        width: 600px;
-        height: 400px;
+        width: 800px;
+        height: 500px;
         position: relative;
     }
     #player1, #player2 {
@@ -129,13 +128,14 @@
     </div>
 </div>
 <div id="footer">
-    <div id="score">Score: 0 - 0</div>
+    Made for Blaine Rees
 </div>
 <div id="winning-screen">
     <div id="winner"></div>
     <button id="replay-btn">Replay</button>
     <div id="final-score"></div>
 </div>
+<div id="score" style="position: fixed; top: 10px; right: 10px; color: #fff; z-index: 1;">Score: 0 - 0</div>
 <button id="up-btn1" class="control-btn">↑</button>
 <button id="down-btn1" class="control-btn">↓</button>
 <button id="up-btn2" class="control-btn">↑</button>
@@ -154,8 +154,8 @@
     const winnerDisplay = document.getElementById('winner');
     const replayBtn = document.getElementById('replay-btn');
     const finalScoreDisplay = document.getElementById('final-score');
-    const gameWidth = 600;
-    const gameHeight = 400;
+    const gameWidth = 800;
+    const gameHeight = 500;
     let ballX = gameWidth / 2;
     let ballY = gameHeight / 2;
     let ballSpeedX = 7;
@@ -283,14 +283,44 @@
         }
     }
 
-    upBtn1.addEventListener('touchstart', () => handleBtnDown('up-btn1'));
-    upBtn1.addEventListener('touchend', () => handleBtnUp('up-btn1'));
-    downBtn1.addEventListener('touchstart', () => handleBtnDown('down-btn1'));
-    downBtn1.addEventListener('touchend', () => handleBtnUp('down-btn1'));
-    upBtn2.addEventListener('touchstart', () => handleBtnDown('up-btn2'));
-    upBtn2.addEventListener('touchend', () => handleBtnUp('up-btn2'));
-    downBtn2.addEventListener('touchstart', () => handleBtnDown('down-btn2'));
-    downBtn2.addEventListener('touchend', () => handleBtnUp('down-btn2'));
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'w') {
+            player1MoveUp = true;
+        }
+        if (event.key === 's') {
+            player1MoveDown = true;
+        }
+        if (event.key === 'ArrowUp') {
+            player2MoveUp = true;
+        }
+        if (event.key === 'ArrowDown') {
+            player2MoveDown = true;
+        }
+    });
+
+    document.addEventListener('keyup', (event) => {
+        if (event.key === 'w') {
+            player1MoveUp = false;
+        }
+        if (event.key === 's') {
+            player1MoveDown = false;
+        }
+        if (event.key === 'ArrowUp') {
+            player2MoveUp = false;
+        }
+        if (event.key === 'ArrowDown') {
+            player2MoveDown = false;
+        }
+    });
+
+    upBtn1.addEventListener('mousedown', () => handleBtnDown('up-btn1'));
+    upBtn1.addEventListener('mouseup', () => handleBtnUp('up-btn1'));
+    downBtn1.addEventListener('mousedown', () => handleBtnDown('down-btn1'));
+    downBtn1.addEventListener('mouseup', () => handleBtnUp('down-btn1'));
+    upBtn2.addEventListener('mousedown', () => handleBtnDown('up-btn2'));
+    upBtn2.addEventListener('mouseup', () => handleBtnUp('up-btn2'));
+    downBtn2.addEventListener('mousedown', () => handleBtnDown('down-btn2'));
+    downBtn2.addEventListener('mouseup', () => handleBtnUp('down-btn2'));
 
     replayBtn.addEventListener('click', () => {
         player1Score = 0;
