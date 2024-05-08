@@ -10,7 +10,157 @@
         padding: 0;
         font-family: Arial, sans-serif;
     }
+    #header {<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Ping Pong</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
     #header {
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        padding: 10px 0;
+    }
+    #footer {
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        font-size: 12px;
+        padding: 5px 0;
+    }
+    #footer .line {
+        border-top: 1px solid #888;
+        margin-top: 5px;
+    }
+    #container {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000;
+    }
+    #game {
+        background-color: #000;
+        border: 2px solid #fff;
+        width: 600px;
+        height: 400px;
+        position: relative;
+    }
+    #player1, #player2 {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 80px;
+        background-color: #fff;
+    }
+    #player1 {
+        left: 10px;
+    }
+    #player2 {
+        right: 10px;
+    }
+    #ball {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        background-color: #fff;
+        border-radius: 50%;
+    }
+    #fullscreen-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+    }
+</style>
+</head>
+<body>
+<div id="header">Made By CueGaming</div>
+<button id="fullscreen-btn">Fullscreen</button>
+<div id="container">
+    <div id="game">
+        <div id="player1"></div>
+        <div id="player2"></div>
+        <div id="ball"></div>
+    </div>
+</div>
+<div id="footer">
+    Made for Blaine Rees
+    <div class="line"></div>
+</div>
+
+<script>
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const gameContainer = document.getElementById('container');
+    const player1 = document.getElementById('player1');
+    const player2 = document.getElementById('player2');
+    const ball = document.getElementById('ball');
+    const gameWidth = 600;
+    const gameHeight = 400;
+    let ballX = gameWidth / 2;
+    let ballY = gameHeight / 2;
+    let ballSpeedX = 5;
+    let ballSpeedY = 5;
+
+    function update() {
+        // Move ball
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+
+        // Check collision with walls
+        if (ballX <= 0 || ballX >= gameWidth) {
+            ballSpeedX = -ballSpeedX;
+        }
+        if (ballY <= 0 || ballY >= gameHeight) {
+            ballSpeedY = -ballSpeedY;
+        }
+
+        // Update ball position
+        ball.style.left = ballX + 'px';
+        ball.style.top = ballY + 'px';
+
+        requestAnimationFrame(update);
+    }
+
+    function init() {
+        update();
+    }
+
+    // Start game when the page loads
+    window.addEventListener('load', init);
+
+    fullscreenBtn.addEventListener('click', () => {
+        if (gameContainer.requestFullscreen) {
+            gameContainer.requestFullscreen();
+        } else if (gameContainer.mozRequestFullScreen) {
+            gameContainer.mozRequestFullScreen();
+        } else if (gameContainer.webkitRequestFullscreen) {
+            gameContainer.webkitRequestFullscreen();
+        } else if (gameContainer.msRequestFullscreen) {
+            gameContainer.msRequestFullscreen();
+        }
+    });
+</script>
+
+</body>
+</html>
+
         background-color: #000;
         color: #fff;
         text-align: center;
