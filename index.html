@@ -56,7 +56,7 @@
         width: 10px;
         height: 80px;
         background-color: #fff;
-        transition: top 0.1s ease-in-out;
+        transition: top 0.05s linear;
     }
     #player1 {
         left: 10px;
@@ -125,11 +125,29 @@
     let ballSpeedY = 7;
     let player1Y = gameHeight / 2;
     let player2Y = gameHeight / 2;
-    let playerSpeed = 10;
+    let playerSpeed = 15;
+    let player1MoveUp = false;
+    let player1MoveDown = false;
+    let player2MoveUp = false;
+    let player2MoveDown = false;
     let player1Score = 0;
     let player2Score = 0;
 
     function update() {
+        // Move paddles
+        if (player1MoveUp && player1Y > 0) {
+            player1Y -= playerSpeed;
+        }
+        if (player1MoveDown && player1Y < gameHeight - 80) {
+            player1Y += playerSpeed;
+        }
+        if (player2MoveUp && player2Y > 0) {
+            player2Y -= playerSpeed;
+        }
+        if (player2MoveDown && player2Y < gameHeight - 80) {
+            player2Y += playerSpeed;
+        }
+
         // Move ball
         ballX += ballSpeedX;
         ballY += ballSpeedY;
@@ -159,6 +177,10 @@
             ballSpeedX = -ballSpeedX;
         }
 
+        // Update paddle positions
+        player1.style.top = player1Y + 'px';
+        player2.style.top = player2Y + 'px';
+
         // Update ball position
         ball.style.left = ballX + 'px';
         ball.style.top = ballY + 'px';
@@ -176,26 +198,38 @@
     }
 
     function handleKeyDown(event) {
-        if (event.key === 'w' && player1Y > 0) {
-            player1Y -= playerSpeed;
+        if (event.key === 'w') {
+            player1MoveUp = true;
         }
-        if (event.key === 's' && player1Y < gameHeight - 80) {
-            player1Y += playerSpeed;
+        if (event.key === 's') {
+            player1MoveDown = true;
         }
-        if (event.key === 'ArrowUp' && player2Y > 0) {
-            player2Y -= playerSpeed;
+        if (event.key === 'ArrowUp') {
+            player2MoveUp = true;
         }
-        if (event.key === 'ArrowDown' && player2Y < gameHeight - 80) {
-            player2Y += playerSpeed;
+        if (event.key === 'ArrowDown') {
+            player2MoveDown = true;
         }
+    }
 
-        // Update paddle positions
-        player1.style.top = player1Y + 'px';
-        player2.style.top = player2Y + 'px';
+    function handleKeyUp(event) {
+        if (event.key === 'w') {
+            player1MoveUp = false;
+        }
+        if (event.key === 's') {
+            player1MoveDown = false;
+        }
+        if (event.key === 'ArrowUp') {
+            player2MoveUp = false;
+        }
+        if (event.key === 'ArrowDown') {
+            player2MoveDown = false;
+        }
     }
 
     function init() {
         window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
         update();
     }
 
