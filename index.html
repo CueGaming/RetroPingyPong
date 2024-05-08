@@ -30,14 +30,11 @@
         bottom: 0;
         width: 100%;
         z-index: 1;
-    }
-    #footer .line {
-        border-top: 1px solid #888;
-        margin-top: 5px;
+        display: none;
     }
     #container {
         width: 100%;
-        height: calc(100vh - 40px);
+        height: calc(100vh - 20px);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -74,29 +71,56 @@
         background-color: #fff;
         border-radius: 50%;
     }
-    #fullscreen-btn {
+    .control-btn {
         position: fixed;
-        top: 10px;
-        left: 10px;
+        bottom: 10px;
+        width: 50px;
+        height: 50px;
         background-color: #000;
         color: #fff;
         border: none;
         cursor: pointer;
-        padding: 5px 10px;
         z-index: 1;
     }
-    #score {
+    #up-btn1 {
+        left: 20px;
+    }
+    #down-btn1 {
+        left: 20px;
+        bottom: 70px;
+    }
+    #up-btn2 {
+        right: 20px;
+    }
+    #down-btn2 {
+        right: 20px;
+        bottom: 70px;
+    }
+    #winning-screen {
         position: fixed;
-        top: 10px;
-        right: 10px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
         color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        display: none;
         z-index: 1;
+    }
+    #winning-screen button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #fff;
+        color: #000;
+        border: none;
+        cursor: pointer;
     }
 </style>
 </head>
 <body>
 <div id="header">Made By CueGaming</div>
-<button id="fullscreen-btn">Fullscreen</button>
 <div id="container">
     <div id="game">
         <div id="player1"></div>
@@ -105,18 +129,31 @@
     </div>
 </div>
 <div id="footer">
-    Made for Blaine Rees
-    <div class="line"></div>
+    <div id="score">Score: 0 - 0</div>
 </div>
-<div id="score">Score: 0 - 0</div>
+<div id="winning-screen">
+    <div id="winner"></div>
+    <button id="replay-btn">Replay</button>
+    <div id="final-score"></div>
+</div>
+<button id="up-btn1" class="control-btn">↑</button>
+<button id="down-btn1" class="control-btn">↓</button>
+<button id="up-btn2" class="control-btn">↑</button>
+<button id="down-btn2" class="control-btn">↓</button>
 
 <script>
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const gameContainer = document.getElementById('container');
     const player1 = document.getElementById('player1');
     const player2 = document.getElementById('player2');
     const ball = document.getElementById('ball');
+    const upBtn1 = document.getElementById('up-btn1');
+    const downBtn1 = document.getElementById('down-btn1');
+    const upBtn2 = document.getElementById('up-btn2');
+    const downBtn2 = document.getElementById('down-btn2');
     const scoreDisplay = document.getElementById('score');
+    const winningScreen = document.getElementById('winning-screen');
+    const winnerDisplay = document.getElementById('winner');
+    const replayBtn = document.getElementById('replay-btn');
+    const finalScoreDisplay = document.getElementById('final-score');
     const gameWidth = 600;
     const gameHeight = 400;
     let ballX = gameWidth / 2;
@@ -132,64 +169,66 @@
     let player2MoveDown = false;
     let player1Score = 0;
     let player2Score = 0;
+    let gamePaused = false;
 
     function update() {
-        // Move paddles
-        if (player1MoveUp && player1Y > 0) {
-            player1Y -= playerSpeed;
-        }
-        if (player1MoveDown && player1Y < gameHeight - 80) {
-            player1Y += playerSpeed;
-        }
-        if (player2MoveUp && player2Y > 0) {
-            player2Y -= playerSpeed;
-        }
-        if (player2MoveDown && player2Y < gameHeight - 80) {
-            player2Y += playerSpeed;
-        }
+        if (!gamePaused) {
+            // Move paddles
+            if (player1MoveUp && player1Y > 0) {
+                player1Y -= playerSpeed;
+            }
+            if (player1MoveDown && player1Y < gameHeight - 80) {
+                player1Y += playerSpeed;
+            }
+            if (player2MoveUp && player2Y > 0) {
+                player2Y -= playerSpeed;
+            }
+            if (player2MoveDown && player2Y < gameHeight - 80) {
+                player2Y += playerSpeed;
+            }
 
-        // Move ball
-        ballX += ballSpeedX;
-        ballY += ballSpeedY;
+            // Move ball
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
 
-        // Check collision with walls
-        if (ballX <= 0) {
-            ballSpeedX = -ballSpeedX;
-            player2Score++;
-            updateScore();
-            resetBall();
-        }
-        if (ballX >= gameWidth) {
-            ballSpeedX = -ballSpeedX;
-            player1Score++;
-            updateScore();
-            resetBall();
-        }
-        if (ballY <= 0 || ballY >= gameHeight) {
-            ballSpeedY = -ballSpeedY;
-        }
+            // Check collision with walls
+            if (ballX <= 0) {
+                ballSpeedX = -ballSpeedX;
+                player2Score++;
+                checkWin();
+                resetBall();
+            }
+            if (ballX >= gameWidth) {
+                ballSpeedX = -ballSpeedX;
+                player1Score++;
+                checkWin();
+                resetBall();
+            }
+            if (ballY <= 0 || ballY >= gameHeight) {
+                ballSpeedY = -ballSpeedY;
+            }
 
-        // Check collision with paddles
-        if (ballX <= 20 && ballY >= player1Y && ballY <= player1Y + 80) {
-            ballSpeedX = -ballSpeedX;
-        }
-        if (ballX >= gameWidth - 30 && ballY >= player2Y && ballY <= player2Y + 80) {
-            ballSpeedX = -ballSpeedX;
-        }
+            // Check collision with paddles
+            if (ballX <= 20 && ballY >= player1Y && ballY <= player1Y + 80) {
+                ballSpeedX = -ballSpeedX;
+            }
+            if (ballX >= gameWidth - 30 && ballY >= player2Y && ballY <= player2Y + 80) {
+                ballSpeedX = -ballSpeedX;
+            }
 
-        // Update paddle positions
-        player1.style.top = player1Y + 'px';
-        player2.style.top = player2Y + 'px';
+            // Update paddle positions
+            player1.style.top = player1Y + 'px';
+            player2.style.top = player2Y + 'px';
 
-        // Update ball position
-        ball.style.left = ballX + 'px';
-        ball.style.top = ballY + 'px';
+            // Update ball position
+            ball.style.left = ballX + 'px';
+            ball.style.top = ballY + 'px';
+
+            // Update score display
+            scoreDisplay.textContent = `Score: ${player1Score} - ${player2Score}`;
+        }
 
         requestAnimationFrame(update);
-    }
-
-    function updateScore() {
-        scoreDisplay.textContent = `Score: ${player1Score} - ${player2Score}`;
     }
 
     function resetBall() {
@@ -197,56 +236,71 @@
         ballY = gameHeight / 2;
     }
 
-    function handleKeyDown(event) {
-        if (event.key === 'w') {
-            player1MoveUp = true;
-        }
-        if (event.key === 's') {
-            player1MoveDown = true;
-        }
-        if (event.key === 'ArrowUp') {
-            player2MoveUp = true;
-        }
-        if (event.key === 'ArrowDown') {
-            player2MoveDown = true;
+    function checkWin() {
+        if (player1Score === 50 || player2Score === 50) {
+            gamePaused = true;
+            winningScreen.style.display = 'flex';
+            if (player1Score === 50) {
+                winnerDisplay.textContent = 'Player 1 Won!';
+            } else {
+                winnerDisplay.textContent = 'Player 2 Won!';
+            }
+            finalScoreDisplay.textContent = `Final Score: ${player1Score} - ${player2Score}`;
         }
     }
 
-    function handleKeyUp(event) {
-        if (event.key === 'w') {
-            player1MoveUp = false;
-        }
-        if (event.key === 's') {
-            player1MoveDown = false;
-        }
-        if (event.key === 'ArrowUp') {
-            player2MoveUp = false;
-        }
-        if (event.key === 'ArrowDown') {
-            player2MoveDown = false;
+    function handleBtnDown(btnId) {
+        switch (btnId) {
+            case 'up-btn1':
+                player1MoveUp = true;
+                break;
+            case 'down-btn1':
+                player1MoveDown = true;
+                break;
+            case 'up-btn2':
+                player2MoveUp = true;
+                break;
+            case 'down-btn2':
+                player2MoveDown = true;
+                break;
         }
     }
 
-    function init() {
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-        update();
+    function handleBtnUp(btnId) {
+        switch (btnId) {
+            case 'up-btn1':
+                player1MoveUp = false;
+                break;
+            case 'down-btn1':
+                player1MoveDown = false;
+                break;
+            case 'up-btn2':
+                player2MoveUp = false;
+                break;
+            case 'down-btn2':
+                player2MoveDown = false;
+                break;
+        }
     }
 
-    // Start game when the page loads
-    window.addEventListener('load', init);
+    upBtn1.addEventListener('touchstart', () => handleBtnDown('up-btn1'));
+    upBtn1.addEventListener('touchend', () => handleBtnUp('up-btn1'));
+    downBtn1.addEventListener('touchstart', () => handleBtnDown('down-btn1'));
+    downBtn1.addEventListener('touchend', () => handleBtnUp('down-btn1'));
+    upBtn2.addEventListener('touchstart', () => handleBtnDown('up-btn2'));
+    upBtn2.addEventListener('touchend', () => handleBtnUp('up-btn2'));
+    downBtn2.addEventListener('touchstart', () => handleBtnDown('down-btn2'));
+    downBtn2.addEventListener('touchend', () => handleBtnUp('down-btn2'));
 
-    fullscreenBtn.addEventListener('click', () => {
-        if (gameContainer.requestFullscreen) {
-            gameContainer.requestFullscreen();
-        } else if (gameContainer.mozRequestFullScreen) {
-            gameContainer.mozRequestFullScreen();
-        } else if (gameContainer.webkitRequestFullscreen) {
-            gameContainer.webkitRequestFullscreen();
-        } else if (gameContainer.msRequestFullscreen) {
-            gameContainer.msRequestFullscreen();
-        }
+    replayBtn.addEventListener('click', () => {
+        player1Score = 0;
+        player2Score = 0;
+        gamePaused = false;
+        winningScreen.style.display = 'none';
+        resetBall();
     });
+
+    update();
 </script>
 
 </body>
