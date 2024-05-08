@@ -10,18 +10,6 @@
         padding: 0;
         font-family: Arial, sans-serif;
     }
-    #header {<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Retro Ping Pong</title>
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-    }
     #header {
         background-color: #000;
         color: #fff;
@@ -88,6 +76,12 @@
         cursor: pointer;
         padding: 5px 10px;
     }
+    #score {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: #fff;
+    }
 </style>
 </head>
 <body>
@@ -104,6 +98,7 @@
     Made for Blaine Rees
     <div class="line"></div>
 </div>
+<div id="score">Score: 0 - 0</div>
 
 <script>
     const fullscreenBtn = document.getElementById('fullscreen-btn');
@@ -111,12 +106,18 @@
     const player1 = document.getElementById('player1');
     const player2 = document.getElementById('player2');
     const ball = document.getElementById('ball');
+    const scoreDisplay = document.getElementById('score');
     const gameWidth = 600;
     const gameHeight = 400;
     let ballX = gameWidth / 2;
     let ballY = gameHeight / 2;
     let ballSpeedX = 5;
     let ballSpeedY = 5;
+    let player1Y = gameHeight / 2;
+    let player2Y = gameHeight / 2;
+    let playerSpeed = 10;
+    let player1Score = 0;
+    let player2Score = 0;
 
     function update() {
         // Move ball
@@ -124,11 +125,28 @@
         ballY += ballSpeedY;
 
         // Check collision with walls
-        if (ballX <= 0 || ballX >= gameWidth) {
+        if (ballX <= 0) {
             ballSpeedX = -ballSpeedX;
+            player2Score++;
+            updateScore();
+            resetBall();
+        }
+        if (ballX >= gameWidth) {
+            ballSpeedX = -ballSpeedX;
+            player1Score++;
+            updateScore();
+            resetBall();
         }
         if (ballY <= 0 || ballY >= gameHeight) {
             ballSpeedY = -ballSpeedY;
+        }
+
+        // Check collision with paddles
+        if (ballX <= 20 && ballY >= player1Y && ballY <= player1Y + 80) {
+            ballSpeedX = -ballSpeedX;
+        }
+        if (ballX >= gameWidth - 30 && ballY >= player2Y && ballY <= player2Y + 80) {
+            ballSpeedX = -ballSpeedX;
         }
 
         // Update ball position
@@ -138,114 +156,41 @@
         requestAnimationFrame(update);
     }
 
+    function updateScore() {
+        scoreDisplay.textContent = `Score: ${player1Score} - ${player2Score}`;
+    }
+
+    function resetBall() {
+        ballX = gameWidth / 2;
+        ballY = gameHeight / 2;
+    }
+
+    function handleKeyDown(event) {
+        if (event.key === 'w' && player1Y > 0) {
+            player1Y -= playerSpeed;
+        }
+        if (event.key === 's' && player1Y < gameHeight - 80) {
+            player1Y += playerSpeed;
+        }
+        if (event.key === 'ArrowUp' && player2Y > 0) {
+            player2Y -= playerSpeed;
+        }
+        if (event.key === 'ArrowDown' && player2Y < gameHeight - 80) {
+            player2Y += playerSpeed;
+        }
+
+        // Update paddle positions
+        player1.style.top = player1Y + 'px';
+        player2.style.top = player2Y + 'px';
+    }
+
     function init() {
+        window.addEventListener('keydown', handleKeyDown);
         update();
     }
 
     // Start game when the page loads
     window.addEventListener('load', init);
-
-    fullscreenBtn.addEventListener('click', () => {
-        if (gameContainer.requestFullscreen) {
-            gameContainer.requestFullscreen();
-        } else if (gameContainer.mozRequestFullScreen) {
-            gameContainer.mozRequestFullScreen();
-        } else if (gameContainer.webkitRequestFullscreen) {
-            gameContainer.webkitRequestFullscreen();
-        } else if (gameContainer.msRequestFullscreen) {
-            gameContainer.msRequestFullscreen();
-        }
-    });
-</script>
-
-</body>
-</html>
-
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        padding: 10px 0;
-    }
-    #footer {
-        background-color: #000;
-        color: #fff;
-        text-align: center;
-        font-size: 12px;
-        padding: 5px 0;
-    }
-    #footer .line {
-        border-top: 1px solid #888;
-        margin-top: 5px;
-    }
-    #container {
-        width: 100%;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #000;
-    }
-    #game {
-        background-color: #000;
-        border: 2px solid #fff;
-        width: 600px;
-        height: 400px;
-        position: relative;
-    }
-    #player1, #player2 {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 10px;
-        height: 80px;
-        background-color: #fff;
-    }
-    #player1 {
-        left: 10px;
-    }
-    #player2 {
-        right: 10px;
-    }
-    #ball {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 20px;
-        height: 20px;
-        background-color: #fff;
-        border-radius: 50%;
-    }
-    #fullscreen-btn {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background-color: #000;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        padding: 5px 10px;
-    }
-</style>
-</head>
-<body>
-<div id="header">Made By CueGaming</div>
-<button id="fullscreen-btn">Fullscreen</button>
-<div id="container">
-    <div id="game">
-        <div id="player1"></div>
-        <div id="player2"></div>
-        <div id="ball"></div>
-    </div>
-</div>
-<div id="footer">
-    Made for Blaine Rees
-    <div class="line"></div>
-</div>
-
-<script>
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const gameContainer = document.getElementById('container');
 
     fullscreenBtn.addEventListener('click', () => {
         if (gameContainer.requestFullscreen) {
