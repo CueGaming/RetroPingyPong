@@ -66,10 +66,21 @@
         background-color: #fff;
         border-radius: 50%;
     }
+    #fullscreen-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+    }
 </style>
 </head>
 <body>
 <div id="header">Made By CueGaming</div>
+<button id="fullscreen-btn">Fullscreen</button>
 <div id="container">
     <div id="game">
         <div id="player1"></div>
@@ -83,7 +94,20 @@
 </div>
 
 <script>
-    // JavaScript for controlling the game will go here
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const gameContainer = document.getElementById('container');
+
+    fullscreenBtn.addEventListener('click', () => {
+        if (gameContainer.requestFullscreen) {
+            gameContainer.requestFullscreen();
+        } else if (gameContainer.mozRequestFullScreen) {
+            gameContainer.mozRequestFullScreen();
+        } else if (gameContainer.webkitRequestFullscreen) {
+            gameContainer.webkitRequestFullscreen();
+        } else if (gameContainer.msRequestFullscreen) {
+            gameContainer.msRequestFullscreen();
+        }
+    });
 </script>
 
 </body>
